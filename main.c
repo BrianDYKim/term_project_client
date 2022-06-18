@@ -28,9 +28,9 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    sprintf(name, "[%s]", argv[3]);
-    sprintf(client_name_info, "%s", argv[3]);
-    sock = socket(PF_INET, SOCK_STREAM, 0);
+    sprintf(name, "[%s]", argv[3]); // 메세지에 붙어서 나갈 이름 포맷을 결정하기
+    sprintf(client_name_info, "%s", argv[3]); // 해당 client가 사용할 대화명을 결정하기
+    sock = socket(PF_INET, SOCK_STREAM, 0); // IPv4를 사용하는 TCP 소켓을 하나 할당
 
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
@@ -43,8 +43,10 @@ int main(int argc, char *argv[]) {
     // connect가 이뤄지자마자 server측에 자신의 이름 정보를 넘겨준다
     write(sock, client_name_info, strlen(client_name_info));
 
+    // send, receive에 대한 thread를 각각 만든다
     pthread_create(&snd_thread, NULL, send_msg, (void *) &sock);
     pthread_create(&rcv_thread, NULL, recv_msg, (void *) &sock);
+    // blocking 함수를 이용해서 쓰레드가 종료될 때까지 main process를 잡아둔다
     pthread_join(snd_thread, &thread_return);
     pthread_join(rcv_thread, &thread_return);
     close(sock);
