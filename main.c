@@ -14,6 +14,7 @@ void *recv_msg(void *arg);
 void error_handling(char *msg);
 
 char name[NAME_SIZE] = "[DEFAULT]";
+char client_name_info[NAME_SIZE] = "DEFAULT";
 char msg[BUF_SIZE];
 
 // TODO send_msg, recv_msg를 수정해서 원하는대로 client의 동작을 조절한다
@@ -28,6 +29,7 @@ int main(int argc, char *argv[]) {
     }
 
     sprintf(name, "[%s]", argv[3]);
+    sprintf(client_name_info, "%s", argv[3]);
     sock = socket(PF_INET, SOCK_STREAM, 0);
 
     memset(&serv_addr, 0, sizeof(serv_addr));
@@ -39,7 +41,7 @@ int main(int argc, char *argv[]) {
         error_handling("connect() error");
 
     // connect가 이뤄지자마자 server측에 자신의 이름 정보를 넘겨준다
-    write(sock, argv[3], strlen(argv[3]));
+    write(sock, client_name_info, strlen(client_name_info));
 
     pthread_create(&snd_thread, NULL, send_msg, (void *) &sock);
     pthread_create(&rcv_thread, NULL, recv_msg, (void *) &sock);
